@@ -832,6 +832,40 @@ class Bezier {
     return shapes;
   }
 
+  _isLineLike(curve) {
+    let delta = 0.0001
+    let points = curve.points
+    if(points.length == 4) {
+      let firstPoint = points[0]
+      let secondPoint = points[1]
+      let thirdPoint = points[2]
+      let forthPoint = points[3]
+      if(Math.abs(firstPoint.x - secondPoint.x) < delta && Math.abs(firstPoint.y - secondPoint.y) < delta
+          && Math.abs(thirdPoint.x - forthPoint.x) < delta && Math.abs(thirdPoint.y - forthPoint.y) < delta) {
+        return true
+      }
+    }
+    return false
+  }
+
+  radiusIntersects(curve, curveIntersectionThreshold) {
+    let mainCurve = this
+    if (!curve) return this.selfintersects(curveIntersectionThreshold);
+    if (curve.p1 && curve.p2) {
+      return this.lineIntersects(curve);
+    }
+    if (curve instanceof Bezier) {
+      if(!this._isLineLike(curve)) {
+        curve = curve.reduce();
+      }
+    }
+    return this.curveintersects(
+      [mainCurve],
+      curve,
+      curveIntersectionThreshold
+    );
+  }
+
   intersects(curve, curveIntersectionThreshold) {
     if (!curve) return this.selfintersects(curveIntersectionThreshold);
     if (curve.p1 && curve.p2) {
