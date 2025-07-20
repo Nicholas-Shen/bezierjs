@@ -2,30 +2,26 @@ var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __markAsModule = (target) => __defProp(target, "__esModule", { value: true });
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
-var __reExport = (target, module2, copyDefault, desc) => {
-  if (module2 && typeof module2 === "object" || typeof module2 === "function") {
-    for (let key of __getOwnPropNames(module2))
-      if (!__hasOwnProp.call(target, key) && (copyDefault || key !== "default"))
-        __defProp(target, key, { get: () => module2[key], enumerable: !(desc = __getOwnPropDesc(module2, key)) || desc.enumerable });
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
   }
-  return target;
+  return to;
 };
-var __toCommonJS = /* @__PURE__ */ ((cache) => {
-  return (module2, temp) => {
-    return cache && cache.get(module2) || (temp = __reExport(__markAsModule({}), module2, 1), cache && cache.set(module2, temp), temp);
-  };
-})(typeof WeakMap !== "undefined" ? /* @__PURE__ */ new WeakMap() : 0);
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // src/bezier.js
 var bezier_exports = {};
 __export(bezier_exports, {
   Bezier: () => Bezier
 });
+module.exports = __toCommonJS(bezier_exports);
 
 // src/utils.js
 var { abs, cos, sin, acos, atan2, sqrt, pow } = Math;
@@ -330,7 +326,14 @@ var utils = {
     return utils.lli4(v1, v1.c, v2, v2.c);
   },
   makeline: function(p1, p2) {
-    return new Bezier(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2, p2.x, p2.y);
+    return new Bezier(
+      p1.x,
+      p1.y,
+      (p1.x + p2.x) / 2,
+      (p1.y + p2.y) / 2,
+      p2.x,
+      p2.y
+    );
   },
   findbbox: function(sections) {
     let mx = nMax, my = nMax, MX = nMin, MY = nMin;
@@ -387,7 +390,13 @@ var utils = {
       bbox: utils.findbbox([start, forward, back, end])
     };
     shape.intersections = function(s2) {
-      return utils.shapeintersections(shape, shape.bbox, s2, s2.bbox, curveIntersectionThreshold);
+      return utils.shapeintersections(
+        shape,
+        shape.bbox,
+        s2,
+        s2.bbox,
+        curveIntersectionThreshold
+      );
     };
     return shape;
   },
@@ -500,7 +509,9 @@ var utils = {
     const dd = utils.compute(t2, d2);
     const qdsum = d.x * d.x + d.y * d.y;
     if (_3d) {
-      num = sqrt(pow(d.y * dd.z - dd.y * d.z, 2) + pow(d.z * dd.x - dd.z * d.x, 2) + pow(d.x * dd.y - dd.x * d.y, 2));
+      num = sqrt(
+        pow(d.y * dd.z - dd.y * d.z, 2) + pow(d.z * dd.x - dd.z * d.x, 2) + pow(d.x * dd.y - dd.x * d.y, 2)
+      );
       dnm = pow(qdsum + d.z * d.z, 3 / 2);
     } else {
       num = d.x * dd.y - d.y * dd.x;
@@ -604,7 +615,9 @@ var utils = {
     if (pairs.length === 0)
       return results;
     pairs.forEach(function(pair) {
-      results = results.concat(utils.pairiteration(pair.left, pair.right, threshold));
+      results = results.concat(
+        utils.pairiteration(pair.left, pair.right, threshold)
+      );
     });
     results = results.filter(function(v, i) {
       return results.indexOf(v) === i;
@@ -715,14 +728,18 @@ var Bezier = class {
     if (coordlen) {
       if (coordlen > 4) {
         if (arguments.length !== 1) {
-          throw new Error("Only new Bezier(point[]) is accepted for 4th and higher order curves");
+          throw new Error(
+            "Only new Bezier(point[]) is accepted for 4th and higher order curves"
+          );
         }
         higher = true;
       }
     } else {
       if (len !== 6 && len !== 8 && len !== 9 && len !== 12) {
         if (arguments.length !== 1) {
-          throw new Error("Only new Bezier(point[]) is accepted for 4th and higher order curves");
+          throw new Error(
+            "Only new Bezier(point[]) is accepted for 4th and higher order curves"
+          );
         }
       }
     }
@@ -1032,21 +1049,23 @@ var Bezier = class {
   extrema() {
     const result = {};
     let roots = [];
-    this.dims.forEach(function(dim) {
-      let mfn = function(v) {
-        return v[dim];
-      };
-      let p = this.dpoints[0].map(mfn);
-      result[dim] = utils.droots(p);
-      if (this.order === 3) {
-        p = this.dpoints[1].map(mfn);
-        result[dim] = result[dim].concat(utils.droots(p));
-      }
-      result[dim] = result[dim].filter(function(t2) {
-        return t2 >= 0 && t2 <= 1;
-      });
-      roots = roots.concat(result[dim].sort(utils.numberSort));
-    }.bind(this));
+    this.dims.forEach(
+      function(dim) {
+        let mfn = function(v) {
+          return v[dim];
+        };
+        let p = this.dpoints[0].map(mfn);
+        result[dim] = utils.droots(p);
+        if (this.order === 3) {
+          p = this.dpoints[1].map(mfn);
+          result[dim] = result[dim].concat(utils.droots(p));
+        }
+        result[dim] = result[dim].filter(function(t2) {
+          return t2 >= 0 && t2 <= 1;
+        });
+        roots = roots.concat(result[dim].sort(utils.numberSort));
+      }.bind(this)
+    );
     result.values = roots.sort(utils.numberSort).filter(function(v, idx) {
       return roots.indexOf(v) === idx;
     });
@@ -1054,9 +1073,11 @@ var Bezier = class {
   }
   bbox() {
     const extrema = this.extrema(), result = {};
-    this.dims.forEach(function(d) {
-      result[d] = utils.getminmax(this, d, extrema[d]);
-    }.bind(this));
+    this.dims.forEach(
+      function(d) {
+        result[d] = utils.getminmax(this, d, extrema[d]);
+      }.bind(this)
+    );
     return result;
   }
   overlaps(curve) {
@@ -1162,10 +1183,12 @@ var Bezier = class {
     d2 = typeof d2 === "number" ? d2 : d1;
     const o = this.order;
     let d = this.points.map((_, i) => (1 - i / o) * d1 + i / o * d2);
-    return new Bezier(this.points.map((p, i) => ({
-      x: p.x + v.x * d[i],
-      y: p.y + v.y * d[i]
-    })));
+    return new Bezier(
+      this.points.map((p, i) => ({
+        x: p.x + v.x * d[i],
+        y: p.y + v.y * d[i]
+      }))
+    );
   }
   scale(d) {
     const order = this.order;
@@ -1179,7 +1202,11 @@ var Bezier = class {
     const clockwise = this.clockwise;
     const points = this.points;
     if (this._linear) {
-      return this.translate(this.normal(0), distanceFn ? distanceFn(0) : d, distanceFn ? distanceFn(1) : d);
+      return this.translate(
+        this.normal(0),
+        distanceFn ? distanceFn(0) : d,
+        distanceFn ? distanceFn(1) : d
+      );
     }
     const r1 = distanceFn ? distanceFn(0) : d;
     const r2 = distanceFn ? distanceFn(1) : d;
@@ -1262,8 +1289,12 @@ var Bezier = class {
     reduced.forEach(function(segment) {
       const slen = segment.length();
       if (graduated) {
-        fcurves.push(segment.scale(linearDistanceFunction(d1, d3, tlen, alen, slen)));
-        bcurves.push(segment.scale(linearDistanceFunction(-d2, -d4, tlen, alen, slen)));
+        fcurves.push(
+          segment.scale(linearDistanceFunction(d1, d3, tlen, alen, slen))
+        );
+        bcurves.push(
+          segment.scale(linearDistanceFunction(-d2, -d4, tlen, alen, slen))
+        );
       } else {
         fcurves.push(segment.scale(d1));
         bcurves.push(segment.scale(-d2));
@@ -1287,12 +1318,48 @@ var Bezier = class {
     const outline = this.outline(d1, d2).curves;
     const shapes = [];
     for (let i = 1, len = outline.length; i < len / 2; i++) {
-      const shape = utils.makeshape(outline[i], outline[len - i], curveIntersectionThreshold);
+      const shape = utils.makeshape(
+        outline[i],
+        outline[len - i],
+        curveIntersectionThreshold
+      );
       shape.startcap.virtual = i > 1;
       shape.endcap.virtual = i < len / 2 - 1;
       shapes.push(shape);
     }
     return shapes;
+  }
+  _isLineLike(curve) {
+    let delta = 1e-4;
+    let points = curve.points;
+    if (points.length == 4) {
+      let firstPoint = points[0];
+      let secondPoint = points[1];
+      let thirdPoint = points[2];
+      let forthPoint = points[3];
+      if (Math.abs(firstPoint.x - secondPoint.x) < delta && Math.abs(firstPoint.y - secondPoint.y) < delta && Math.abs(thirdPoint.x - forthPoint.x) < delta && Math.abs(thirdPoint.y - forthPoint.y) < delta) {
+        return true;
+      }
+    }
+    return false;
+  }
+  radiusIntersects(curve, curveIntersectionThreshold) {
+    let mainCurve = this;
+    if (!curve)
+      return this.selfintersects(curveIntersectionThreshold);
+    if (curve.p1 && curve.p2) {
+      return this.lineIntersects(curve);
+    }
+    if (curve instanceof Bezier) {
+      if (!this._isLineLike(curve)) {
+        curve = curve.reduce();
+      }
+    }
+    return this.curveintersects(
+      [mainCurve],
+      curve,
+      curveIntersectionThreshold
+    );
   }
   intersects(curve, curveIntersectionThreshold) {
     if (!curve)
@@ -1303,7 +1370,11 @@ var Bezier = class {
     if (curve instanceof Bezier) {
       curve = curve.reduce();
     }
-    return this.curveintersects(this.reduce(), curve, curveIntersectionThreshold);
+    return this.curveintersects(
+      this.reduce(),
+      curve,
+      curveIntersectionThreshold
+    );
   }
   lineIntersects(line) {
     const mx = min(line.p1.x, line.p2.x), my = min(line.p1.y, line.p2.y), MX = max(line.p1.x, line.p2.x), MY = max(line.p1.y, line.p2.y);
@@ -1333,7 +1404,11 @@ var Bezier = class {
     });
     let intersections = [];
     pairs.forEach(function(pair) {
-      const result = utils.pairiteration(pair.left, pair.right, curveIntersectionThreshold);
+      const result = utils.pairiteration(
+        pair.left,
+        pair.right,
+        curveIntersectionThreshold
+      );
       if (result.length > 0) {
         intersections = intersections.concat(result);
       }
@@ -1401,7 +1476,6 @@ var Bezier = class {
     return circles;
   }
 };
-module.exports = __toCommonJS(bezier_exports);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Bezier
